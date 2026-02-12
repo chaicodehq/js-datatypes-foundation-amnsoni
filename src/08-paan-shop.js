@@ -21,7 +21,7 @@
  *   2. freezeMenu(menu)
  *      - Object.freeze() se menu ko immutable banao
  *      - Return: frozen object
- *      - Agar menu object nahi hai ya null hai, return {}
+ *      - Ag
  *      - Frozen ke baad koi modification kaam nahi karegi!
  *      - Example: const frozen = freezeMenu({meetha:30}); frozen.meetha = 100; // still 30
  *
@@ -47,16 +47,48 @@
  */
 export function createPaanOrder(basePaan, customizations) {
   // Your code here
+  if (typeof basePaan !== 'object' || basePaan === null) {
+    return {};
+  }
+  if (typeof customizations !== 'object' || customizations === null) {
+    return { ...basePaan };
+  }
+  return Object.assign({}, basePaan, customizations);
 }
 
 export function freezeMenu(menu) {
   // Your code here
+  if (typeof menu !== 'object' || menu === null) {
+    return {};
+  } 
+  return Object.freeze({ ...menu });
 }
 
 export function updatePrices(menu, increase) {
   // Your code here
+  if (typeof menu !== 'object' || menu === null || typeof increase !== 'number') {
+    return {};
+  }
+
+  const updatedEntries = Object.entries(menu).map(([key, value]) => {
+    if (typeof value === 'number') {
+      return [key, value + increase];
+    }
+    return [key, value];
+  });
+
+  return Object.fromEntries(updatedEntries);
 }
 
 export function mergeDailySpecials(regularMenu, specialsMenu) {
   // Your code here
+  if (typeof regularMenu !== "object" || regularMenu === null) {
+    regularMenu = {};
+  }
+
+  if (typeof specialsMenu !== 'object' || specialsMenu === null) {
+    specialsMenu = {};
+  }
+
+  return {...regularMenu, ...specialsMenu};  
 }

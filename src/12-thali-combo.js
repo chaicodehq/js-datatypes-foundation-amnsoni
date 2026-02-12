@@ -53,17 +53,78 @@
  *   // => "RAJASTHANI THALI (Veg) - Items: dal - Rs.250.00"
  */
 export function createThaliDescription(thali) {
-  // Your code here
+  if (typeof thali !== 'object' || thali === null || !thali.name || !thali.items || !thali.price || typeof thali.isVeg !== 'boolean') {
+    return "";
+  }
+
+  const name = thali.name.toUpperCase();
+  const isVeg = thali.isVeg ? "Veg" : "Non-Veg";
+  const items = thali.items.join(", ");
+  const price = thali.price.toFixed(2);
+
+  return `${name} (${isVeg}) - Items: ${items} - Rs.${price}`;
 }
 
 export function getThaliStats(thalis) {
   // Your code here
+  if (!Array.isArray(thalis) || thalis.length <= 0) {
+    return null;
+  }
+
+  const vegCount = thalis.filter(thali => thali.isVeg).length;
+  const nonVegCount = thalis.length - vegCount;
+
+  const totalPrice = thalis.reduce((acc, curr) => acc + curr.price, 0); 
+
+  const averagePrice = totalPrice / (thalis.length);
+  const cheapest = Math.min(...thalis.map(thali => thali.price));
+  const costliest = Math.max(...thalis.map(thali => thali.price));
+  const menuItems = thalis.map(thali => thali.name);
+
+  return {
+    totalThalis: menuItems.length,
+    vegCount: vegCount,
+    nonVegCount: nonVegCount,
+    avgPrice: averagePrice.toFixed(2),
+    cheapest: cheapest,
+    costliest: costliest,
+    names: menuItems  
+  }
 }
 
 export function searchThaliMenu(thalis, query) {
   // Your code here
+  if (typeof thalis !== 'object' || thalis === null || typeof query !== 'string') {
+    return [];
+  }
+
+  const lowerCaseQuery = query.toLowerCase();
+  return thalis.filter(thali => {
+    const nameMatch = thali.name.toLowerCase().includes(lowerCaseQuery);
+    const itemMatch = thali.items.some(item => item.toLowerCase().includes(lowerCaseQuery));
+    return nameMatch || itemMatch;
+  })  
 }
 
 export function generateThaliReceipt(customerName, thalis) {
-  // Your code here
+  if (typeof customerName !== 'string' || !Array.isArray(thalis) || thalis.length <= 0) {
+    return "";
+  }
+
+  const upperCaseName = customerName.toUpperCase();
+  const lineItems = thalis.map(thali => `- ${thali.name} x Rs.${thali.price}`).join('\n');
+  const total = thalis.reduce((acc, curr) => {
+    acc = acc + curr.price;
+    return acc;
+  }, 0);
+  const itemsCount = thalis.length;
+
+  return `THALI RECEIPT\n---\nCustomer: ${upperCaseName}\n${lineItems}\n---\nTotal: Rs.${total}\nItems: ${itemsCount}`;
 }
+//  4. generateThaliReceipt(customerName, thalis)
+//  *      - Template literals + .map() + .join("\n") + .reduce() se receipt banao
+//  *      - Format:
+//  *        "THALI RECEIPT\n---\nCustomer: {NAME}\n{line items}\n---\nTotal: Rs.{total}\nItems: {count}"
+//  *      - Line item: "- {thali name} x Rs.{price}"
+//  *      - customerName UPPERCASE mein
+//  *      - Agar customerName string nahi hai ya thalis array nahi hai/empty hai, return ""
